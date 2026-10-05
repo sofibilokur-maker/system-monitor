@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="62e90d27-97b8-4f46-b46b-4d66f6157980" name="Changes" comment="" />
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="Python Script" />
+      </list>
+    </option>
+  </component>
+  <component name="ProjectColorInfo">{
+  &quot;associatedIndex&quot;: 3
+}</component>
+  <component name="ProjectId" id="3JuWq2ztVvRnCu9nrJebP7TjFTi" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;ModuleVcsDetector.initialDetectionPerformed&quot;: &quot;true&quot;,
+    &quot;Python.agent.executor&quot;: &quot;Run&quot;,
+    &quot;Python.dashbord.executor&quot;: &quot;Run&quot;,
+    &quot;Python.gatherdata.executor&quot;: &quot;Run&quot;,
+    &quot;Python.laucher.executor&quot;: &quot;Run&quot;,
+    &quot;Python.main.executor&quot;: &quot;Run&quot;,
+    &quot;Python.server.executor&quot;: &quot;Run&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252&quot;: &quot;true&quot;,
+    &quot;last_opened_file_path&quot;: &quot;D:/PycharmProjects/PythonProject/Моніторінг/dashboard&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable&quot;
+  }
+}</component>
+  <component name="RecentsManager">
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="D:\PycharmProjects\PythonProject\Моніторінг\dashboard" />
+    </key>
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="D:\PycharmProjects\PythonProject\Моніторінг" />
+      <recent name="D:\PycharmProjects\PythonProject\Моніторінг\monitoring_server" />
+    </key>
+  </component>
+  <component name="SharedIndexes">
+    <attachedChunks>
+      <set>
+        <option value="bundled-python-sdk-02acdf704d18-cbfc7b97e6b2-com.jetbrains.pycharm.community.sharedIndexes.bundled-PC-252.28539.27" />
+      </set>
+    </attachedChunks>
+  </component>
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="62e90d27-97b8-4f46-b46b-4d66f6157980" name="Changes" comment="" />
+      <created>1790511620778</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1790511620778</updated>
+    </task>
+    <servers />
+  </component>
+</project>

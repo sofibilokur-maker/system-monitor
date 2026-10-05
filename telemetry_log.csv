@@ -1,0 +1,4 @@
+device_id,timestamp,cpu_usage,ram_usage,disk_usage,network_upload_mb_s,network_download_mb_s
+DESKTOP-E5HLEFH,2026-09-27T12:46:59+00:00,3.6,68.8,70.5,0.004,0.156
+DESKTOP-E5HLEFH,2026-09-28T12:24:28+00:00,8.8,66.7,70.5,0.004,0.009
+DESKTOP-E5HLEFH,2026-09-28T12:25:00+00:00,7.9,68.1,70.5,0.019,0.013

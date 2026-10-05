@@ -1,0 +1,1958 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Monitoring Dashboard</title>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.5.1/dist/chart.umd.min.js"></script>
+
+<style>
+:root{
+    --bg:#f5f6fb;
+    --white:#fff;
+    --navy:#3e4050;
+    --purple:#7567e8;
+    --purple-dark:#6557db;
+    --purple-soft:#eeecff;
+    --text:#353744;
+    --muted:#9699a8;
+    --line:#ececf2;
+    --green:#62c98b;
+    --yellow:#f5bf4f;
+    --red:#f16d72;
+    --blue:#6c80e9;
+    --orange:#ff9f5a;
+    --shadow:0 8px 28px rgba(54,58,85,.07);
+    --danger:#f16d72;
+    --warn:#f5bf4f;
+    --ok:#62c98b;
+    --text-dim:#9699a8;
+}
+
+*{
+    box-sizing:border-box;
+}
+
+body{
+    margin:0;
+    min-height:100vh;
+    background:var(--bg);
+    color:var(--text);
+    font-family:"Segoe UI",Arial,sans-serif;
+    display:flex;
+    overflow-x:hidden;
+}
+
+.sidebar{
+    width:245px;
+    min-height:100vh;
+    flex-shrink:0;
+    position:relative;
+    background:linear-gradient(180deg,#7a6df0 0%,#6759dd 100%);
+    color:#fff;
+    padding:0 18px 22px;
+    overflow:hidden;
+}
+
+.sidebar::after{
+    content:"";
+    position:absolute;
+    top:0;
+    right:-72px;
+    width:118px;
+    height:160px;
+    background:var(--bg);
+    border-radius:0 0 0 100%;
+    opacity:.98;
+}
+
+.profile{
+    padding:27px 8px 24px;
+    position:relative;
+    z-index:1;
+}
+
+.profile-avatar{
+    width:58px;
+    height:58px;
+    border-radius:50%;
+    background:linear-gradient(145deg,#e9e7ff,#bcb6ff);
+    display:grid;
+    place-items:center;
+    color:var(--purple-dark);
+    font-weight:800;
+    font-size:20px;
+    margin-bottom:10px;
+}
+
+.profile-name{
+    font-weight:700;
+    font-size:14px;
+}
+
+.profile-role{
+    font-size:11px;
+    opacity:.72;
+    margin-top:3px;
+}
+
+.nav{
+    margin-top:18px;
+}
+
+.nav-item{
+    height:46px;
+    padding:0 14px;
+    border-radius:9px;
+    display:flex;
+    align-items:center;
+    gap:12px;
+    margin:5px 0;
+    color:rgba(255,255,255,.78);
+    font-size:13px;
+    font-weight:500;
+}
+
+.nav-item.active{
+    background:rgba(255,255,255,.19);
+    color:#fff;
+    font-weight:700;
+}
+
+.nav-icon{
+    width:18px;
+    text-align:center;
+    font-size:15px;
+}
+
+.device-block{
+    margin:25px 7px 0;
+}
+
+.device-block label{
+    display:block;
+    font-size:10px;
+    text-transform:uppercase;
+    letter-spacing:.8px;
+    opacity:.65;
+    margin-bottom:7px;
+}
+
+select#deviceSelect{
+    width:100%;
+    border:1px solid rgba(255,255,255,.18);
+    border-radius:9px;
+    padding:10px 11px;
+    background:rgba(255,255,255,.13);
+    color:#fff;
+    outline:none;
+    font-size:12px;
+}
+
+select#deviceSelect option{
+    color:#222;
+}
+
+.server-status{
+    position:absolute;
+    left:25px;
+    bottom:23px;
+    font-size:11px;
+    opacity:.82;
+}
+
+.dot{
+    display:inline-block;
+    width:8px;
+    height:8px;
+    border-radius:50%;
+    margin-right:7px;
+}
+
+.dot.ok{
+    background:#6de09b;
+}
+
+.dot.bad{
+    background:#ff8086;
+}
+
+.page{
+    flex:1;
+    min-width:0;
+}
+
+.topbar{
+    height:66px;
+    background:var(--navy);
+    color:#fff;
+    display:flex;
+    align-items:center;
+    padding:0 30px;
+    gap:27px;
+}
+
+.brand-mini{
+    font-size:14px;
+    font-weight:700;
+    margin-right:10px;
+}
+
+.top-actions{
+    display:flex;
+    gap:17px;
+    margin-left:auto;
+    color:rgba(255,255,255,.75);
+    font-size:14px;
+}
+
+.main{
+    padding:29px 34px 40px;
+    max-width:1450px;
+    margin:0 auto;
+}
+
+.page-heading{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    margin-bottom:20px;
+}
+
+.page-title{
+    display:inline-flex;
+    align-items:center;
+    gap:9px;
+    padding:9px 15px;
+    border-radius:7px;
+    background:var(--purple);
+    color:#fff;
+    font-size:14px;
+    font-weight:700;
+    box-shadow:0 6px 15px rgba(117,103,232,.2);
+}
+
+.actions{
+    display:flex;
+    align-items:center;
+    gap:10px;
+}
+
+.updated{
+    color:var(--muted);
+    font-size:11px;
+    margin-right:6px;
+}
+
+.btn{
+    padding:9px 16px;
+    border:none;
+    border-radius:7px;
+    background:var(--purple);
+    color:#fff;
+    font-size:12px;
+    font-weight:700;
+    cursor:pointer;
+    box-shadow:0 6px 15px rgba(117,103,232,.2);
+}
+
+.btn.alt{
+    background:var(--green);
+    box-shadow:0 6px 15px rgba(98,201,139,.25);
+}
+
+.btn:disabled{
+    opacity:.45;
+    cursor:not-allowed;
+    box-shadow:none;
+}
+
+.cards{
+    display:grid;
+    grid-template-columns:repeat(4,minmax(0,1fr));
+    gap:15px;
+    margin-bottom:16px;
+}
+
+.card,
+.panel{
+    background:var(--white);
+    border:1px solid var(--line);
+    border-radius:8px;
+    box-shadow:var(--shadow);
+}
+
+.card{
+    padding:17px 18px 15px;
+}
+
+.card-top{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+}
+
+.card .label{
+    font-size:12px;
+    font-weight:600;
+    color:#6e7180;
+}
+
+.card .small{
+    font-size:10px;
+    color:var(--muted);
+}
+
+.metric-row{
+    display:flex;
+    justify-content:space-between;
+    align-items:flex-end;
+    margin-top:8px;
+}
+
+.card .value{
+    font-size:26px;
+    line-height:1;
+    font-weight:750;
+    color:#383a47;
+}
+
+.metric-state{
+    font-size:10px;
+    color:var(--green);
+    font-weight:600;
+}
+
+.bar-bg{
+    width:100%;
+    height:5px;
+    margin-top:13px;
+    background:#f0f0f5;
+    border-radius:5px;
+    overflow:hidden;
+}
+
+.bar-fill{
+    height:100%;
+    border-radius:5px;
+    transition:width .4s ease;
+}
+
+.content-grid{
+    display:grid;
+    grid-template-columns:minmax(0,2fr) minmax(280px,.95fr);
+    gap:15px;
+}
+
+.panel{
+    padding:17px 18px;
+}
+
+.panel h3{
+    margin:0;
+    font-size:13px;
+    font-weight:700;
+    color:#474956;
+}
+
+.panel-header{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    margin-bottom:13px;
+}
+
+.period{
+    font-size:10px;
+    color:var(--muted);
+    border:1px solid var(--line);
+    padding:5px 8px;
+    border-radius:5px;
+}
+
+.chart-panel{
+    min-height:405px;
+}
+
+.chart-wrap{
+    height:330px;
+}
+
+.right-col{
+    display:flex;
+    flex-direction:column;
+    gap:15px;
+}
+
+.predict-row{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:8px;
+    margin-top:14px;
+}
+
+.predict-box{
+    background:#f7f7fb;
+    border:1px solid #eeeef4;
+    border-radius:7px;
+    padding:12px 7px;
+    text-align:center;
+}
+
+.predict-box .m{
+    font-size:9px;
+    color:var(--muted);
+}
+
+.predict-box .v{
+    font-size:18px;
+    font-weight:750;
+    margin-top:5px;
+}
+
+.alert-item{
+    display:flex;
+    align-items:center;
+    gap:9px;
+    padding:10px 0;
+    border-bottom:1px solid var(--line);
+    font-size:11px;
+    color:#606370;
+}
+
+.alert-item:last-child{
+    border-bottom:none;
+}
+
+.alert-badge{
+    width:7px;
+    height:7px;
+    border-radius:50%;
+    flex-shrink:0;
+}
+
+.empty-note{
+    color:var(--muted);
+    font-size:11px;
+    padding-top:13px;
+}
+
+.status-card{
+    display:flex;
+    align-items:center;
+    gap:11px;
+    margin-top:14px;
+    padding:11px 12px;
+    background:#f7f7fb;
+    border-radius:7px;
+}
+
+.status-icon{
+    width:28px;
+    height:28px;
+    border-radius:7px;
+    background:var(--purple-soft);
+    display:grid;
+    place-items:center;
+    color:var(--purple);
+}
+
+.status-text strong{
+    display:block;
+    font-size:11px;
+}
+
+.status-text span{
+    display:block;
+    margin-top:2px;
+    font-size:9px;
+    color:var(--muted);
+}
+
+@media(max-width:1200px){
+    .cards{
+        grid-template-columns:repeat(2,minmax(0,1fr));
+    }
+}
+
+@media(max-width:950px){
+    .sidebar{
+        width:205px;
+    }
+
+    .main{
+        padding:22px;
+    }
+
+    .content-grid{
+        grid-template-columns:1fr;
+    }
+}
+
+@media(max-width:700px){
+    body{
+        display:block;
+    }
+
+    .sidebar{
+        width:100%;
+        min-height:auto;
+        padding-bottom:70px;
+    }
+
+    .sidebar::after{
+        display:none;
+    }
+
+    .topbar{
+        padding:0 18px;
+    }
+
+    .cards{
+        grid-template-columns:1fr;
+    }
+
+    .main{
+        padding:18px;
+    }
+
+    .page-heading{
+        flex-direction:column;
+        align-items:flex-start;
+        gap:12px;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<aside class="sidebar">
+
+    <div class="profile">
+        <div class="profile-avatar">PC</div>
+        <div class="profile-name">System Monitor</div>
+        <div class="profile-role">Computer systems</div>
+    </div>
+
+    <nav class="nav">
+
+        <div class="nav-item active">
+            <span class="nav-icon">◉</span>
+            Dashboard
+        </div>
+
+        <div class="nav-item">
+            <span class="nav-icon">▣</span>
+            Пристрої
+        </div>
+
+    </nav>
+
+    <div class="device-block">
+        <label>Пристрій</label>
+        <select id="deviceSelect"></select>
+    </div>
+
+    <div class="server-status">
+        <span class="dot ok" id="statusDot"></span>
+        <span id="statusText">Підключення...</span>
+    </div>
+
+</aside>
+
+<div class="page">
+
+    <header class="topbar">
+
+        <div class="brand-mini">
+            SYSTEM MONITOR
+        </div>
+
+        <div class="top-actions">
+            <span>⌕</span>
+        </div>
+
+    </header>
+
+    <main class="main">
+
+        <div class="page-heading">
+
+            <div class="page-title">
+                <span>▦</span>
+                Dashboard
+            </div>
+
+            <div class="actions">
+
+                <span class="updated" id="updatedAt">
+                    Очікування збору...
+                </span>
+
+                <button id="collectBtn" class="btn">
+                    Дістати дані
+                </button>
+
+                <button id="predictBtn" class="btn alt" disabled>
+                    Прогноз
+                </button>
+
+            </div>
+
+        </div>
+
+        <section class="cards">
+
+            <div class="card">
+
+                <div class="card-top">
+                    <div class="label">CPU Usage</div>
+                    <div class="small">Last</div>
+                </div>
+
+                <div class="metric-row">
+                    <div class="value" id="cpuValue">—</div>
+                    <div class="metric-state">● Normal</div>
+                </div>
+
+                <div class="bar-bg">
+                    <div
+                        class="bar-fill"
+                        id="cpuBar"
+                        style="width:0%;background:var(--blue)"
+                    ></div>
+                </div>
+
+            </div>
+
+
+            <div class="card">
+
+                <div class="card-top">
+                    <div class="label">RAM Usage</div>
+                    <div class="small">Last</div>
+                </div>
+
+                <div class="metric-row">
+                    <div class="value" id="ramValue">—</div>
+                    <div class="metric-state">● Normal</div>
+                </div>
+
+                <div class="bar-bg">
+                    <div
+                        class="bar-fill"
+                        id="ramBar"
+                        style="width:0%;background:var(--yellow)"
+                    ></div>
+                </div>
+
+            </div>
+
+
+            <div class="card">
+
+                <div class="card-top">
+                    <div class="label">Disk Usage</div>
+                    <div class="small">Last</div>
+                </div>
+
+                <div class="metric-row">
+                    <div class="value" id="diskValue">—</div>
+                    <div class="metric-state">● Storage</div>
+                </div>
+
+                <div class="bar-bg">
+                    <div
+                        class="bar-fill"
+                        id="diskBar"
+                        style="width:0%;background:var(--red)"
+                    ></div>
+                </div>
+
+            </div>
+
+
+            <div class="card">
+
+                <div class="card-top">
+                    <div class="label">Temperature</div>
+                    <div class="small">Last</div>
+                </div>
+
+                <div class="metric-row">
+                    <div class="value" id="tempValue">—</div>
+
+                    <div class="metric-state" id="tempState">
+                        ● Normal
+                    </div>
+                </div>
+
+                <div class="bar-bg">
+                    <div
+                        class="bar-fill"
+                        id="tempBar"
+                        style="width:0%;background:var(--orange)"
+                    ></div>
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <section class="content-grid">
+
+            <div class="panel chart-panel">
+
+                <div class="panel-header">
+
+                    <h3>
+                        Історія навантаження
+                    </h3>
+
+                    <div class="period">
+                        Last 10 records
+                    </div>
+
+                </div>
+
+                <div class="chart-wrap">
+                    <canvas id="historyChart"></canvas>
+                </div>
+
+            </div>
+
+
+            <div class="right-col">
+
+                <div class="panel">
+
+                    <div class="panel-header">
+
+                        <h3>
+                            Прогноз CPU
+                        </h3>
+
+                        <div class="period">
+                            Forecast
+                        </div>
+
+                    </div>
+
+                    <div
+                        class="predict-row"
+                        id="predictRow"
+                    ></div>
+
+                    <div class="status-card">
+
+                        <div class="status-icon">
+                            ↗
+                        </div>
+
+                        <div class="status-text">
+
+                            <strong>
+                                Прогноз за зібраними даними
+                            </strong>
+
+                            <span>
+                                Лінійна регресія · натисни «Прогноз» після збору
+                            </span>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <div class="panel">
+
+                    <div class="panel-header">
+
+                        <h3>
+                            Alerts
+                        </h3>
+
+                        <div class="period">
+                            Last
+                        </div>
+
+                    </div>
+
+                    <div id="alertsList">
+
+                        <div class="empty-note">
+                            Немає активних алертів
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <div class="panel">
+
+                    <div class="panel-header">
+
+                        <h3>
+                            System status
+                        </h3>
+
+                    </div>
+
+                    <div
+                        class="status-card"
+                        style="margin-top:0"
+                    >
+
+                        <div class="status-icon">
+                            ✓
+                        </div>
+
+                        <div class="status-text">
+
+                            <strong id="systemStatusTitle">
+                                Агент чекає команди
+                            </strong>
+
+                            <span id="systemStatusText">
+                                Дані збираються, коли натиснеш «Дістати дані»
+                            </span>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </section>
+
+    </main>
+
+</div>
+
+
+<script>
+
+/* ====================================================
+   CONFIGURATION
+==================================================== */
+
+const API_BASE = "http://127.0.0.1:8000";
+
+const PREDICT_AHEAD_MIN = [1, 3, 5];
+
+const TEMP_KEY = "temperature";
+
+let chart = null;
+let currentDevice = null;
+let lastRecords = [];
+
+let collectionTimer = null;
+
+
+/* ====================================================
+   API
+==================================================== */
+
+async function fetchJSON(url) {
+
+    const res = await fetch(url);
+
+    if (!res.ok) {
+        throw new Error("HTTP " + res.status);
+    }
+
+    return res.json();
+}
+
+
+/* ====================================================
+   STATUS
+==================================================== */
+
+function setStatus(ok, text) {
+
+    const dot =
+        document.getElementById("statusDot");
+
+    const statusText =
+        document.getElementById("statusText");
+
+    dot.className =
+        "dot " + (ok ? "ok" : "bad");
+
+    statusText.textContent = text;
+}
+
+
+/* ====================================================
+   HELPERS
+==================================================== */
+
+function colorForValue(v) {
+
+    return v > 85
+        ? "var(--danger)"
+        : v > 65
+            ? "var(--warn)"
+            : "var(--ok)";
+}
+
+
+function hasNum(v) {
+
+    return typeof v === "number" && !isNaN(v);
+}
+
+
+/* ====================================================
+   CLEAR DASHBOARD
+==================================================== */
+
+function clearDashboard() {
+
+    lastRecords = [];
+
+    if (chart) {
+        chart.destroy();
+        chart = null;
+    }
+
+    document.getElementById("cpuValue").textContent = "—";
+    document.getElementById("ramValue").textContent = "—";
+    document.getElementById("diskValue").textContent = "—";
+    document.getElementById("tempValue").textContent = "—";
+
+    document.getElementById("cpuBar").style.width = "0%";
+    document.getElementById("ramBar").style.width = "0%";
+    document.getElementById("diskBar").style.width = "0%";
+    document.getElementById("tempBar").style.width = "0%";
+
+    const tempState =
+        document.getElementById("tempState");
+
+    tempState.textContent =
+        "● Немає даних";
+
+    tempState.style.color =
+        "var(--muted)";
+
+    document.getElementById("alertsList").innerHTML = `
+        <div class="empty-note">
+            Немає активних алертів
+        </div>
+    `;
+
+    document.getElementById("predictRow").innerHTML = "";
+
+    document.getElementById("updatedAt").textContent =
+        "Очікування нових даних...";
+
+    document.getElementById("predictBtn").disabled = true;
+
+    document.getElementById("systemStatusTitle").textContent =
+        "Агент чекає команди";
+
+    document.getElementById("systemStatusText").textContent =
+        "Натисни «Дістати дані», щоб почати збір";
+}
+
+
+/* ====================================================
+   DEVICES
+==================================================== */
+
+async function loadDevices() {
+
+    const data =
+        await fetchJSON(
+            API_BASE + "/api/devices"
+        );
+
+    const select =
+        document.getElementById("deviceSelect");
+
+    select.innerHTML = "";
+
+    data.devices.forEach(d => {
+
+        const option =
+            document.createElement("option");
+
+        option.value = d;
+        option.textContent = d;
+
+        select.appendChild(option);
+
+    });
+
+    if (data.devices.length) {
+
+        currentDevice =
+            data.devices[0];
+
+        select.value =
+            currentDevice;
+
+    }
+
+    select.onchange = () => {
+
+        currentDevice =
+            select.value;
+
+        clearDashboard();
+
+        setStatus(
+            true,
+            "Пристрій вибрано"
+        );
+    };
+}
+
+
+/* ====================================================
+   FORECAST
+==================================================== */
+
+function linearForecast(points, aheadMinList) {
+
+    if (points.length < 2) {
+
+        return aheadMinList.map(m => ({
+            m,
+            v: null
+        }));
+
+    }
+
+    const t0 = points[0].t;
+
+    const xs = points.map(p => (p.t - t0) / 1000);
+
+    const ys = points.map(p => p.v);
+
+    const n = xs.length;
+
+    const sumX = xs.reduce((a, b) => a + b, 0);
+
+    const sumY = ys.reduce((a, b) => a + b, 0);
+
+    const sumXY = xs.reduce((a, x, i) => a + x * ys[i], 0);
+
+    const sumXX = xs.reduce((a, x) => a + x * x, 0);
+
+    const denominator = n * sumXX - sumX * sumX;
+
+    const a = (n * sumXY - sumX * sumY) / (denominator || 1e-9);
+
+    const b = (sumY - a * sumX) / n;
+
+    const lastX = xs[n - 1];
+
+
+    const span = lastX - xs[0];
+
+    const mean = sumY / n;
+
+    return aheadMinList.map(m => {
+
+        const horizon = m * 60;
+
+        const trend = a * (lastX + horizon) + b;
+
+
+        const w = span > 0 ? Math.min(1, span / horizon) : 0;
+
+        const v = w * trend + (1 - w) * mean;
+
+        return {
+            m,
+            v: Math.round(
+                Math.max(0, Math.min(100, v))
+            )
+        };
+
+    });
+
+}
+
+
+function renderPredictions(forecast) {
+
+    const row =
+        document.getElementById(
+            "predictRow"
+        );
+
+    row.innerHTML =
+        forecast.map(f => {
+
+            const value =
+                f.v === null
+                    ? "—"
+                    : f.v + "%";
+
+            const color =
+                f.v === null
+                    ? "var(--text-dim)"
+                    : colorForValue(f.v);
+
+            return `
+                <div class="predict-box">
+
+                    <div class="m">
+                        +${f.m} хв
+                    </div>
+
+                    <div
+                        class="v"
+                        style="color:${color}"
+                    >
+                        ${value}
+                    </div>
+
+                </div>
+            `;
+
+        }).join("");
+
+}
+
+
+/* ====================================================
+   TEMPERATURE
+==================================================== */
+
+function renderTemperature(latest) {
+
+    const valEl =
+        document.getElementById(
+            "tempValue"
+        );
+
+    const barEl =
+        document.getElementById(
+            "tempBar"
+        );
+
+    const stEl =
+        document.getElementById(
+            "tempState"
+        );
+
+    const t =
+        Number(latest[TEMP_KEY]);
+
+    if (!hasNum(t)) {
+
+        valEl.textContent = "—";
+
+        barEl.style.width = "0%";
+
+        stEl.textContent =
+            "● Немає даних";
+
+        stEl.style.color =
+            "var(--muted)";
+
+        return;
+    }
+
+    valEl.textContent =
+        t + "°C";
+
+    barEl.style.width =
+        Math.max(
+            0,
+            Math.min(100, t)
+        ) + "%";
+
+
+    if (t > 85) {
+
+        stEl.textContent =
+            "● Critical";
+
+        stEl.style.color =
+            "var(--danger)";
+
+    }
+    else if (t > 70) {
+
+        stEl.textContent =
+            "● Warm";
+
+        stEl.style.color =
+            "var(--warn)";
+
+    }
+    else {
+
+        stEl.textContent =
+            "● Normal";
+
+        stEl.style.color =
+            "var(--ok)";
+
+    }
+
+}
+
+
+/* ====================================================
+   ALERTS
+==================================================== */
+
+function renderAlerts(latest) {
+
+    const list =
+        document.getElementById(
+            "alertsList"
+        );
+
+    const alerts = [];
+
+
+    if (latest.cpu_usage > 90) {
+
+        alerts.push({
+            sev:"danger",
+            text:
+                `Високе навантаження CPU: ${latest.cpu_usage}%`
+        });
+
+    }
+    else if (latest.cpu_usage > 75) {
+
+        alerts.push({
+            sev:"warn",
+            text:
+                `CPU наближається до межі: ${latest.cpu_usage}%`
+        });
+
+    }
+
+
+    if (latest.ram_usage > 90) {
+
+        alerts.push({
+            sev:"danger",
+            text:
+                `Критичне використання RAM: ${latest.ram_usage}%`
+        });
+
+    }
+    else if (latest.ram_usage > 75) {
+
+        alerts.push({
+            sev:"warn",
+            text:
+                `RAM наближається до межі: ${latest.ram_usage}%`
+        });
+
+    }
+
+
+    if (latest.disk_usage > 90) {
+
+        alerts.push({
+            sev:"danger",
+            text:
+                `Диск майже заповнений: ${latest.disk_usage}%`
+        });
+
+    }
+
+
+    const t =
+        Number(latest[TEMP_KEY]);
+
+    if (hasNum(t)) {
+
+        if (t > 85) {
+
+            alerts.push({
+                sev:"danger",
+                text:
+                    `Критична температура: ${t}°C`
+            });
+
+        }
+        else if (t > 70) {
+
+            alerts.push({
+                sev:"warn",
+                text:
+                    `Висока температура: ${t}°C`
+            });
+
+        }
+
+    }
+
+
+    list.innerHTML =
+        alerts.length
+
+            ? alerts.map(a => {
+
+                const badgeColor =
+                    a.sev === "danger"
+                        ? "var(--danger)"
+                        : "var(--warn)";
+
+                return `
+                    <div class="alert-item">
+
+                        <span
+                            class="alert-badge"
+                            style="background:${badgeColor}"
+                        ></span>
+
+                        <span>
+                            ${a.text}
+                        </span>
+
+                    </div>
+                `;
+
+            }).join("")
+
+            : `
+                <div class="empty-note">
+                    Немає активних алертів
+                </div>
+            `;
+}
+
+
+/* ====================================================
+   CHART
+==================================================== */
+
+function renderChart(records) {
+
+    const mk = (
+        label,
+        key,
+        color
+    ) => ({
+
+        label,
+
+        data:
+            records.map(
+                r => Number(r[key])
+            ),
+
+        borderColor:color,
+
+        tension:.3,
+
+        pointRadius:0
+
+    });
+
+
+    const datasets = [
+
+        mk(
+            "CPU",
+            "cpu_usage",
+            "#6c80e9"
+        ),
+
+        mk(
+            "RAM",
+            "ram_usage",
+            "#f5bf4f"
+        ),
+
+        mk(
+            "Disk",
+            "disk_usage",
+            "#f16d72"
+        )
+
+    ];
+
+
+    if (
+        records.some(
+            r => hasNum(
+                Number(r[TEMP_KEY])
+            )
+        )
+    ) {
+
+        datasets.push(
+            mk(
+                "Temp °C",
+                TEMP_KEY,
+                "#ff9f5a"
+            )
+        );
+
+    }
+
+
+    if (chart) {
+        chart.destroy();
+    }
+
+
+    const canvas =
+        document.getElementById(
+            "historyChart"
+        );
+
+
+    chart =
+        new Chart(
+            canvas.getContext("2d"),
+            {
+
+                type:"line",
+
+                data:{
+
+                    labels:
+                        records.map(
+                            r =>
+                                new Date(
+                                    r.timestamp
+                                ).toLocaleTimeString()
+                        ),
+
+                    datasets
+
+                },
+
+                options:{
+
+                    responsive:true,
+
+                    maintainAspectRatio:false,
+
+                    animation:false,
+
+                    scales:{
+
+                        x:{
+
+                            ticks:{
+                                color:"#9699a8",
+                                maxTicksLimit:8
+                            },
+
+                            grid:{
+                                color:"#ececf2"
+                            }
+
+                        },
+
+                        y:{
+
+                            min:0,
+
+                            max:100,
+
+                            ticks:{
+                                color:"#9699a8"
+                            },
+
+                            grid:{
+                                color:"#ececf2"
+                            }
+
+                        }
+
+                    },
+
+                    plugins:{
+
+                        legend:{
+
+                            labels:{
+                                color:"#3e4050"
+                            }
+
+                        }
+
+                    }
+
+                }
+
+            }
+        );
+
+}
+
+
+/* ====================================================
+   REFRESH
+==================================================== */
+
+async function refresh() {
+
+    if (!currentDevice) {
+        return;
+    }
+
+    try {
+
+        const data =
+            await fetchJSON(
+                API_BASE +
+                `/api/telemetry/${currentDevice}?limit=10`
+            );
+
+
+        const records =
+            data.records
+                .slice()
+                .reverse();
+
+
+        if (!records.length) {
+
+            setStatus(
+                true,
+                "Дані відсутні"
+            );
+
+            return;
+        }
+
+
+        const latest =
+            records[records.length - 1];
+
+
+        for (
+            const [id,key]
+            of [
+                ["cpu","cpu_usage"],
+                ["ram","ram_usage"],
+                ["disk","disk_usage"]
+            ]
+        ) {
+
+            const value =
+                Number(latest[key]) || 0;
+
+
+            document.getElementById(
+                id + "Value"
+            ).textContent =
+                value + "%";
+
+
+            document.getElementById(
+                id + "Bar"
+            ).style.width =
+                Math.max(
+                    0,
+                    Math.min(100,value)
+                ) + "%";
+
+        }
+
+
+        renderTemperature(latest);
+
+        renderChart(records);
+
+        lastRecords = records;
+
+        renderAlerts(latest);
+
+
+        document.getElementById(
+            "updatedAt"
+        ).textContent =
+            "Оновлено: " +
+            new Date(
+                latest.timestamp
+            ).toLocaleTimeString();
+
+
+        setStatus(
+            true,
+            "Сервер підключено"
+        );
+
+    }
+    catch(e) {
+
+        console.error(e);
+
+        setStatus(
+            false,
+            "Немає з'єднання з сервером"
+        );
+
+    }
+
+}
+
+
+/* ====================================================
+   COLLECTION
+==================================================== */
+
+async function startCollect() {
+
+    if (!currentDevice) {
+        return;
+    }
+
+
+    if (collectionTimer) {
+        clearInterval(collectionTimer);
+        collectionTimer = null;
+    }
+
+
+    const collectBtn =
+        document.getElementById(
+            "collectBtn"
+        );
+
+    const predictBtn =
+        document.getElementById(
+            "predictBtn"
+        );
+
+
+    /*
+       ОЧИЩАЄМО СТАРІ ДАНІ
+       перед кожним новим збором
+    */
+
+    clearDashboard();
+
+
+    collectBtn.disabled = true;
+
+    predictBtn.disabled = true;
+
+
+    document.getElementById(
+        "updatedAt"
+    ).textContent =
+        "Запуск збору...";
+
+
+    document.getElementById(
+        "systemStatusTitle"
+    ).textContent =
+        "Збір даних";
+
+
+    document.getElementById(
+        "systemStatusText"
+    ).textContent =
+        "Агент збирає 10 нових записів";
+
+
+    try {
+
+        const response =
+            await fetch(
+
+                API_BASE +
+                `/api/devices/${currentDevice}/collect?duration=50&interval=5`,
+
+                {
+                    method:"POST"
+                }
+
+            );
+
+
+        if (!response.ok) {
+
+            throw new Error(
+                "HTTP " + response.status
+            );
+
+        }
+
+
+        /*
+           Перевіряємо статус кожні 3 секунди.
+           ВАЖЛИВО:
+           тут НЕ робимо refresh(),
+           тому старі дані не з'являться.
+        */
+
+        collectionTimer =
+            setInterval(
+                async () => {
+
+                    try {
+
+                        const job =
+                            await fetchJSON(
+                                API_BASE +
+                                `/api/devices/${currentDevice}/collect/status`
+                            );
+
+
+                        const label =
+                            document.getElementById(
+                                "updatedAt"
+                            );
+
+
+                        if (
+                            job.status === "pending"
+                        ) {
+
+                            label.textContent =
+                                "Чекаємо агента...";
+
+                            document.getElementById(
+                                "systemStatusTitle"
+                            ).textContent =
+                                "Очікування агента";
+
+                            document.getElementById(
+                                "systemStatusText"
+                            ).textContent =
+                                "Агент отримує команду на збір";
+
+                        }
+                        else if (
+                            job.status === "running"
+                        ) {
+
+                            label.textContent =
+                                "Збір даних...";
+
+                            document.getElementById(
+                                "systemStatusTitle"
+                            ).textContent =
+                                "Збір даних";
+
+                            document.getElementById(
+                                "systemStatusText"
+                            ).textContent =
+                                "Збираємо 10 нових записів";
+
+                        }
+                        else if (
+                            job.status === "done"
+                        ) {
+
+                            clearInterval(
+                                collectionTimer
+                            );
+
+                            collectionTimer = null;
+
+
+                            /*
+                               ТІЛЬКИ ПІСЛЯ ЗАВЕРШЕННЯ
+                               завантажуємо нові дані.
+                            */
+
+                            await refresh();
+
+
+                            collectBtn.disabled =
+                                false;
+
+                            predictBtn.disabled =
+                                lastRecords.length < 2;
+
+
+                            label.textContent =
+                                "Дані зібрано ✓";
+
+
+                            document.getElementById(
+                                "systemStatusTitle"
+                            ).textContent =
+                                "Збір завершено";
+
+                            document.getElementById(
+                                "systemStatusText"
+                            ).textContent =
+                                "Отримано нові дані з агента";
+
+                        }
+
+                    }
+                    catch(e) {
+
+                        console.error(e);
+
+                        clearInterval(
+                            collectionTimer
+                        );
+
+                        collectionTimer = null;
+
+                        collectBtn.disabled =
+                            false;
+
+                        predictBtn.disabled =
+                            true;
+
+                        setStatus(
+                            false,
+                            "Помилка перевірки збору"
+                        );
+
+                    }
+
+                },
+                3000
+            );
+
+    }
+    catch(e) {
+
+        console.error(e);
+
+        collectBtn.disabled =
+            false;
+
+        predictBtn.disabled =
+            true;
+
+        setStatus(
+            false,
+            "Помилка запуску збору"
+        );
+
+        document.getElementById(
+            "updatedAt"
+        ).textContent =
+            "Помилка збору";
+
+    }
+
+}
+
+
+/* ====================================================
+   FORECAST BUTTON
+==================================================== */
+
+function doForecast() {
+
+    if (lastRecords.length < 2) {
+
+        renderPredictions(
+            PREDICT_AHEAD_MIN.map(m => ({
+                m,
+                v:null
+            }))
+        );
+
+        return;
+    }
+
+
+    const pts =
+        lastRecords
+            .slice(-10)
+            .map(
+                r => ({
+                    t:new Date(
+                        r.timestamp
+                    ).getTime(),
+
+                    v:Number(
+                        r.cpu_usage
+                    )
+                })
+            )
+            .filter(
+                p => !isNaN(p.t) && !isNaN(p.v)
+            );
+
+
+    renderPredictions(
+        linearForecast(
+            pts,
+            PREDICT_AHEAD_MIN
+        )
+    );
+
+}
+
+
+/* ====================================================
+   EVENTS
+==================================================== */
+
+document
+    .getElementById("collectBtn")
+    .addEventListener(
+        "click",
+        startCollect
+    );
+
+
+document
+    .getElementById("predictBtn")
+    .addEventListener(
+        "click",
+        doForecast
+    );
+
+
+/* ====================================================
+   INITIALIZATION
+==================================================== */
+
+(async function init() {
+
+    /*
+       НЕ викликаємо refresh() тут.
+
+       Тому при відкритті dashboard
+       старі записи НЕ завантажуються.
+    */
+
+    clearDashboard();
+
+    try {
+
+        await loadDevices();
+
+        setStatus(
+            true,
+            "Сервер підключено"
+        );
+
+    }
+    catch(e) {
+
+        console.error(e);
+
+        setStatus(
+            false,
+            "Немає з'єднання з сервером"
+        );
+
+    }
+
+})();
+
+</script>
+
+</body>
+</html>
